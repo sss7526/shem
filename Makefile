@@ -7,7 +7,7 @@ help:
     @echo " make alias ALIAS= REAL_EMAIL=                # Create an alias for an existing email"
     @echo " make reset_password USER= DOMAIN= PASSWORD=  # Reset password for a virtual email user"
     @echo " make make_script_executable                  # Make the setup script executable"
-    @echo " make run_script                              # Run the setup script with sudo privileges"
+    @echo " make run_script DOMAIN=                              # Run the setup script with sudo privileges"
     @echo " make learn_spam PATH=                        # Teach SpamAssassin about spam emails"
     @echo " make learn_ham PATH=                         # Teach SpamAssassin about ham emails"
     @echo " make unlearn_spam PATH=                      # Unteach SpamAssassin about spam emails"
@@ -36,7 +36,7 @@ make_script_executable:
 
 run_script: make_script_executable
     @echo "Running the setup script with sudo privileges"
-    sudo ./setup_email_server.sh
+    DOMAIN=$(DOMAIN) MYSQL_ROOT_PASSWORD=$$MYSQL_ROOT_PASSWORD MYSQL_POSTFIX_PASSWORD=$$MYSQL_POSTFIX_PASSWORD sudo ./setup_email_server.sh $(DOMAIN)
 
 learn_spam:
     @echo "Learning spam from $(PATH)"

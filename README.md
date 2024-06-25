@@ -9,19 +9,31 @@ This script automates the setup and configuration of an email server on a fresh 
 - A domain name (e.g., mycooldomain.com)
 - Update MySQL root password and Postfix MySQL password in the script
 
-## Usage
+## Instructions
 
-1. Make the script executable:
+1. **Set Environment Variables:**
+
+    Export the required environment variables for sensitive data:
+
+    ```sh
+    export MYSQL_ROOT_PASSWORD='your_mysql_root_password'
+    export MYSQL_POSTFIX_PASSWORD='your_postfix_mysql_password'
+    ```
+
+2. **Make the script executable:**
+
     ```sh
     chmod +x setup_email_server.sh
     ```
 
-2. Run the script:
+3. **Run the setup script with the specified domain:**
+
     ```sh
-    sudo ./setup_email_server.sh
+    sudo make run_script DOMAIN='your_domain.com'
     ```
 
-3. Use the provided Makefile for maintenance tasks:
+4. **Use the provided Makefile for other maintenance tasks:**
+
     ```sh
     make help
     ```

@@ -1,26 +1,44 @@
 #!/bin/bash
 
-set -e
 
-# Variables
-DOMAIN="mycooldomain.com"
-EMAIL="admin@mycooldomain.com"
-SSL_CERT_DIR="/etc/letsencrypt/live/$DOMAIN"
-VMAIL_USER="vmail"
-VMAIL_GROUP="vmail"
-VMAIL_UID=5000
-MYSQL_ROOT_PASSWORD="rootpassword"
-MYSQL_POSTFIX_PASSWORD="postfixpassword"
-POSTFIX_CONF_DIR="/etc/postfix"
-DOVECOT_CONF_DIR="/etc/dovecot"
-ROUNDCUBE_DIR="/var/www/roundcube"
-CRON_FILE="/etc/cron.d/auto_update"
+
+
+set -e
 
 # Ensure the script is run by 'root' user
 if [ "$(id -u)" -ne 0 ]; then
   echo "This script must be run as root"
   exit 1
 fi
+
+# Validate required environment variables
+if [[ -z "$MYSQL_ROOT_PASSWORD" || -z "$MYSQL_POSTFIX_PASSWORD" ]]; then
+  echo "Error: Required environment variables (MYSQL_ROOT_PASSWORD, MYSQL_POSTFIX_PASSWORD) are not set."
+  exit 1
+fi
+
+# Check for the domain argument
+if [ -z "$1" ]; then
+  echo "Usage: $0 <DOMAIN>"
+  exit 1
+fi
+
+
+# Variables
+DOMAIN=$1
+EMAIL="admin@$DOMAIN"
+SSL_CERT_DIR="/etc/letsencrypt/live/$DOMAIN"
+VMAIL_USER="vmail"
+VMAIL_GROUP="vmail"
+VMAIL_UID=5000
+MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+MYSQL_POSTFIX_PASSWORD=${MYSQL_POSTFIX_PASSWORD}
+POSTFIX_CONF_DIR="/etc/postfix"
+DOVECOT_CONF_DIR="/etc/dovecot"
+ROUNDCUBE_DIR="/var/www/roundcube"
+CRON_FILE="/etc/cron.d/auto_update"
+
+
 
 # Disable Apache2 if installed and running
 if systemctl is-active --quiet apache2; then
