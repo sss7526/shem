@@ -49,7 +49,7 @@ fi
 # Update and install necessary packages
 apt update
 apt upgrade -y
-apt install -y postfix postfix-mysql dovecot-core dovecot-imapd dovecot-mysql opendkim opendkim-tools spamassassin spamc clamav clamav-daemon clamav-milter certbot ufw nginx php php-fpm php-mysql mariadb-server roundcube roundcube-mysql roundcube-plugins mail-stack-delivery unzip
+apt install -y postfix postfix-mysql dovecot-core dovecot-imapd dovecot-mysql opendkim opendkim-tools spamassassin spamc clamav clamav-daemon clamav-milter certbot ufw nginx php php-fpm php-mysql mariadb-server roundcube roundcube-mysql roundcube-plugins unzip arj bzip2 cabextract cpio file gzip lha lzop nomarch p7zip pax rar rpm unrar unzip zip zoo
 
 # Ensure necessary directories exist
 mkdir -p /etc/postfix
@@ -233,25 +233,32 @@ server {
 }
 
 server {
-  listen 443 ssl;
+  listen 443 ssl http2 default_server;
   server_name mail.$DOMAIN;
 
   ssl_certificate $SSL_CERT_DIR/fullchain.pem;
   ssl_certificate_key $SSL_CERT_DIR/privkey.pem;
   ssl_protocols TLSv1.2 TLSv1.3;
-  ssl_ciphers HIGH:!aNULL:!MD5;
+  ssl_ciphers ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+3DES:DH+3DES:RSA+AES:RSA+3DES:!ADH:!AECDH:!MD5:!DSS;
 
   root $ROUNDCUBE_DIR;
   index index.php index.html index.htm;
+  autoindex off;
 
   location / {
     try_files \$uri \$uri/ =404;
   }
 
+  location ~ ^/(README|INSTALL|LICENSE|CHANGELOG|UPGRADING)$ {
+        deny all;
+    }
+
   location ~ \.php$ {
+    try_files $uri =404;
     include snippets/fastcgi-php.conf;
     fastcgi_pass unix:/var/run/php/php-fpm.sock;
     fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+    fastcgi_intercept_errors on;
   }
 
   location ~ /\.ht {
